@@ -150,6 +150,8 @@ print('verdict:', sa['verdict']); print(); print(sa['development_disclosure'])""
 {('* ' + F['flag_block']) if F['flag_block'] else ''}
 * Pipeline checks found no implementation problem (section 9); "signal-like" means only 'score above the threshold', not a known signal label. {F['sa_disclosure']}
 * **Not established:** the mapping itself; absence of shared physical events across splits; any causal reading of importance; performance on real data. With {F['test_con']} test continuum events all estimates are imprecise.""")
+    from .notebook_comments import apply as add_plain_language
+    C = add_plain_language(C, nbf)
     nb = nbf.v4.new_notebook(); nb["cells"] = C; nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
     return nb
 
