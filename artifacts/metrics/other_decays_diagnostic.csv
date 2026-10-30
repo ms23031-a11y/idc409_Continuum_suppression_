@@ -1,0 +1,7 @@
+type,role,rows_scored,scored_on,fraction_accepted_as_signal,mean_score
+0,continuum,69,held-out test rows,0.9420289855072463,0.9866666666666668
+1,signal,5297,held-out test rows,0.9329809326033603,0.9868585992070983
+2,"other_decay (excluded, out of scope)",23333,all rows of the excluded code,0.9377705395791368,0.9867160245146358
+3,"other_decay (excluded, out of scope)",8172,all rows of the excluded code,0.9530102790014684,0.9875801517376406
+4,"other_decay (excluded, out of scope)",1879,all rows of the excluded code,0.9526343799893561,0.987735497605109
+5,"other_decay (excluded, out of scope)",1457,all rows of the excluded code,0.9368565545641729,0.9870281400137267

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+.DS_Store
+# Original dataset: redistribute only if permitted by the course; see README "Data"
+data/raw/*.csv
+# Regenerable from the CSV with `python -m src.run_all`
+data/hep.sqlite

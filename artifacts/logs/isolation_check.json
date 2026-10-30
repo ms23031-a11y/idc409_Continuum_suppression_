@@ -1,0 +1,14 @@
+{
+  "models": [
+    "single_cut",
+    "logreg",
+    "tree",
+    "boosting"
+  ],
+  "reduced_features_identical": true,
+  "corr_features_identical": true,
+  "hyperparameters_identical": true,
+  "thresholds_identical": true,
+  "validation_scores_identical": true,
+  "all_identical": true
+}

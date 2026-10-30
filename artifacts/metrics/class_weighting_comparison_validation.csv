@@ -1,0 +1,5 @@
+Model,"best validation AUC, no weighting","best validation AUC, training-only class weighting",weighting chosen
+Logistic regression,0.505,0.505,no
+Decision tree,0.518,0.543,yes
+Random forest,0.508,0.562,yes
+Gradient boosting (HistGB),0.539,0.548,yes

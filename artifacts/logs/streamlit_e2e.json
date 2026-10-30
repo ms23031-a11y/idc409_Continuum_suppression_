@@ -1,0 +1,8 @@
+{
+  "valid_upload_ok": true,
+  "valid_upload_label_text": true,
+  "missing_column_rejected": true,
+  "nan_rejected": true,
+  "non_numeric_rejected": true,
+  "all_ok": true
+}

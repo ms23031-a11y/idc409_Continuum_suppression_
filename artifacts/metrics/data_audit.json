@@ -1,0 +1,446 @@
+{
+  "shape": [
+    70606,
+    61
+  ],
+  "n_features": 59,
+  "dtypes": {
+    "float64": 59,
+    "int64": 2
+  },
+  "type_counts": {
+    "0": 462,
+    "1": 35303,
+    "2": 23333,
+    "3": 8172,
+    "4": 1879,
+    "5": 1457
+  },
+  "missing_total": 0,
+  "inf_total": 0,
+  "constant_features": [],
+  "duplicate_rows_excl_index": 0,
+  "duplicate_feature_vectors": 0,
+  "feature_vectors_with_conflicting_type": 0,
+  "duplicate_event_shape_keys": 0,
+  "index_column": {
+    "unique": false,
+    "n_repeated_values": 1766,
+    "equals_row_number": false,
+    "range_by_type": {
+      "0": [
+        239,
+        50699
+      ],
+      "1": [
+        0,
+        35302
+      ],
+      "2": [
+        27,
+        2483999
+      ],
+      "3": [
+        263,
+        860900
+      ],
+      "4": [
+        149,
+        193724
+      ],
+      "5": [
+        35,
+        153986
+      ]
+    },
+    "unique_within_each_type": true,
+    "verdict": "Observed: repeats across the file, is unique within each type code, and its range depends on the code (type 1 runs exactly 0..N-1). This resembles a running index from separate per-category files, but its origin is NOT documented. It is not a reliable event ID and could encode the label, so it is EXCLUDED from predictors."
+  },
+  "exact_zero_fraction_top": {
+    "CleoConeCS__bo1__cmROE__bc": 0.4927,
+    "CleoConeCS__bo1__bc": 0.2424,
+    "CleoConeCS__bo2__cmROE__bc": 0.2045,
+    "CleoConeCS__bo9__cmROE__bc": 0.1482,
+    "CleoConeCS__bo9__bc": 0.1421,
+    "CleoConeCS__bo8__cmROE__bc": 0.1379,
+    "CleoConeCS__bo3__cmROE__bc": 0.1293,
+    "CleoConeCS__bo7__cmROE__bc": 0.1275,
+    "CleoConeCS__bo8__bc": 0.1171,
+    "CleoConeCS__bo6__cmROE__bc": 0.1157
+  },
+  "common_sentinel_hits": {
+    "-999": 0,
+    "-999.0": 0,
+    "-9999": 0,
+    "9999": 0,
+    "999": 0,
+    "-1": 0
+  },
+  "feature_ranges": {
+    "R2": [
+      0.0051166214980185,
+      0.9823039174079896
+    ],
+    "thrustBm": [
+      0.7693930268287659,
+      0.9999430179595948
+    ],
+    "thrustOm": [
+      0.539537250995636,
+      1.0
+    ],
+    "cosTBTO": [
+      8.935727237258106e-06,
+      0.9999995827674866
+    ],
+    "cosTBz": [
+      2.2094045561971143e-05,
+      0.999992609024048
+    ],
+    "KSFWVariables__boet__bc": [
+      0.4984918534755707,
+      21.808223724365234
+    ],
+    "KSFWVariables__bomm2__bc": [
+      -428.8587036132813,
+      42.42125701904297
+    ],
+    "CleoConeCS__bo1__bc": [
+      0.0,
+      16.22677993774414
+    ],
+    "CleoConeCS__bo2__bc": [
+      0.0,
+      9.392724990844728
+    ],
+    "CleoConeCS__bo3__bc": [
+      0.0,
+      9.032670021057127
+    ],
+    "CleoConeCS__bo4__bc": [
+      0.0,
+      8.393495559692383
+    ],
+    "CleoConeCS__bo5__bc": [
+      0.0,
+      5.957575798034668
+    ],
+    "CleoConeCS__bo6__bc": [
+      0.0,
+      6.6336669921875
+    ],
+    "CleoConeCS__bo7__bc": [
+      0.0,
+      5.7625732421875
+    ],
+    "CleoConeCS__bo8__bc": [
+      0.0,
+      6.222139835357666
+    ],
+    "CleoConeCS__bo9__bc": [
+      0.0,
+      5.793546199798584
+    ],
+    "CleoConeCS__bo1__cmROE__bc": [
+      0.0,
+      6.957594394683838
+    ],
+    "CleoConeCS__bo2__cmROE__bc": [
+      0.0,
+      7.231544017791748
+    ],
+    "CleoConeCS__bo3__cmROE__bc": [
+      0.0,
+      6.292925834655762
+    ],
+    "CleoConeCS__bo4__cmROE__bc": [
+      0.0,
+      5.47563362121582
+    ],
+    "CleoConeCS__bo5__cmROE__bc": [
+      0.0,
+      5.58809757232666
+    ],
+    "CleoConeCS__bo6__cmROE__bc": [
+      0.0,
+      6.354106903076172
+    ],
+    "CleoConeCS__bo7__cmROE__bc": [
+      0.0,
+      5.747502326965332
+    ],
+    "CleoConeCS__bo8__cmROE__bc": [
+      0.0,
+      5.922353267669678
+    ],
+    "CleoConeCS__bo9__cmROE__bc": [
+      0.0,
+      5.793546199798584
+    ],
+    "KSFWVariables__bohso00__bc": [
+      -174.41795349121094,
+      602.60400390625
+    ],
+    "KSFWVariables__bohso02__bc": [
+      -38.1425666809082,
+      83.52562713623047
+    ],
+    "KSFWVariables__bohso04__bc": [
+      -5.065591812133789,
+      19.65289688110352
+    ],
+    "KSFWVariables__bohso10__bc": [
+      -58.28585052490234,
+      262.84881591796875
+    ],
+    "KSFWVariables__bohso12__bc": [
+      -23.978315353393555,
+      24.964160919189453
+    ],
+    "KSFWVariables__bohso14__bc": [
+      -6.185704708099365,
+      13.203630447387695
+    ],
+    "KSFWVariables__bohso20__bc": [
+      -85.31349182128906,
+      244.44435119628903
+    ],
+    "KSFWVariables__bohso22__bc": [
+      -71.15392303466797,
+      143.1312255859375
+    ],
+    "KSFWVariables__bohso24__bc": [
+      -43.20716857910156,
+      56.6024055480957
+    ],
+    "KSFWVariables__bohoo0__bc": [
+      5.9453923313412815e-06,
+      141972.3125
+    ],
+    "KSFWVariables__bohoo1__bc": [
+      -1826.05517578125,
+      780.48095703125
+    ],
+    "KSFWVariables__bohoo2__bc": [
+      -3097.1630859375,
+      6613.66064453125
+    ],
+    "KSFWVariables__bohoo3__bc": [
+      -1199.3271484375,
+      1344.9324951171875
+    ],
+    "KSFWVariables__bohoo4__bc": [
+      -2142.61474609375,
+      722.6494140625
+    ],
+    "KSFWVariables__bohso00__cmFS1__bc": [
+      -261.6269226074219,
+      903.906005859375
+    ],
+    "KSFWVariables__bohso02__cmFS1__bc": [
+      -30.47023582458496,
+      99.61268615722656
+    ],
+    "KSFWVariables__bohso04__cmFS1__bc": [
+      -13.33989143371582,
+      69.69698333740234
+    ],
+    "KSFWVariables__bohso10__cmFS1__bc": [
+      -87.42877960205078,
+      394.2732238769531
+    ],
+    "KSFWVariables__bohso12__cmFS1__bc": [
+      -18.872257232666016,
+      10.937084197998049
+    ],
+    "KSFWVariables__bohso14__cmFS1__bc": [
+      -12.613802909851074,
+      15.528493881225586
+    ],
+    "KSFWVariables__bohso20__cmFS1__bc": [
+      -127.9702377319336,
+      366.6665344238281
+    ],
+    "KSFWVariables__bohso22__cmFS1__bc": [
+      -79.09281921386719,
+      110.9170913696289
+    ],
+    "KSFWVariables__bohso24__cmFS1__bc": [
+      -49.14950942993164,
+      111.56727600097656
+    ],
+    "KSFWVariables__bohoo0__cmFS1__bc": [
+      5.945392786088632e-06,
+      141972.3125
+    ],
+    "KSFWVariables__bohoo1__cmFS1__bc": [
+      -1826.05517578125,
+      780.48095703125
+    ],
+    "KSFWVariables__bohoo2__cmFS1__bc": [
+      -3097.1630859375,
+      6613.66064453125
+    ],
+    "KSFWVariables__bohoo3__cmFS1__bc": [
+      -1199.3271484375,
+      1344.9324951171875
+    ],
+    "KSFWVariables__bohoo4__cmFS1__bc": [
+      -2142.61474609375,
+      722.6494140625
+    ],
+    "foxWolframR1": [
+      0.0002652346156537,
+      0.9994905591011048
+    ],
+    "foxWolframR2": [
+      0.0341764725744724,
+      0.9988154768943788
+    ],
+    "foxWolframR3": [
+      0.0004817592562176,
+      0.9969859719276428
+    ],
+    "foxWolframR4": [
+      0.0104276835918426,
+      0.9961209297180176
+    ],
+    "thrust": [
+      0.5969098210334778,
+      0.9998015761375428
+    ],
+    "thrustAxisCosTheta": [
+      -0.9996325611140706,
+      0.9999836986848168
+    ]
+  },
+  "leakage_candidates": [
+    "Unnamed: 0",
+    "type"
+  ],
+  "experiment": {
+    "primary_codes_requested": [
+      -1,
+      0,
+      1
+    ],
+    "n_selected": 35765,
+    "n_signal": 35303,
+    "n_continuum": 462,
+    "continuum_rows_by_code": {
+      "0": 462
+    },
+    "n_type_minus1": 0,
+    "signal_fraction": 0.9870823430728366,
+    "majority_accuracy": 0.9870823430728366,
+    "n_excluded": 34841,
+    "excluded_by_code": {
+      "2": 23333,
+      "3": 8172,
+      "4": 1879,
+      "5": 1457
+    }
+  },
+  "csv_sha256": "fadaeb5a20a7809658f760eb4b49feef3ee89c7823d1a215356d40e20266cf67",
+  "csv_bytes": 80030189,
+  "feature_families": {
+    "KSFW moments": 14,
+    "KSFW moments (cmFS1)": 14,
+    "CLEO cones": 9,
+    "CLEO cones (cmROE)": 9,
+    "Thrust / angular": 6,
+    "Fox-Wolfram": 5,
+    "KSFW (et, mm2)": 2
+  },
+  "database_check": {
+    "raw_table_rowcount_matches_csv": true,
+    "raw_table_values_identical_to_csv": true,
+    "raw_type_and_index_identical": true,
+    "events_features_equal_raw": true,
+    "primary_view_rows_equal_pandas_subset": true,
+    "primary_view_only_intended_codes": true,
+    "target_matches_pandas_mapping_on_primary": true,
+    "target_null_for_excluded_rows": true,
+    "primary_rows_have_target_and_split": true,
+    "excluded_rows_marked_excluded": true,
+    "type_mapping_counts_match_csv": true,
+    "no_type_minus1_rows_created": true,
+    "sql_count_by_split": {
+      "excluded": 34841,
+      "test": 5366,
+      "train": 25033,
+      "val": 5366
+    },
+    "sql_count_by_role": {
+      "continuum": 462,
+      "other_decay": 34841,
+      "signal": 35303
+    },
+    "mapping_rows": [
+      [
+        -1,
+        "continuum",
+        1,
+        0
+      ],
+      [
+        0,
+        "continuum",
+        1,
+        462
+      ],
+      [
+        1,
+        "signal",
+        1,
+        35303
+      ],
+      [
+        2,
+        "other_decay",
+        0,
+        23333
+      ],
+      [
+        3,
+        "other_decay",
+        0,
+        8172
+      ],
+      [
+        4,
+        "other_decay",
+        0,
+        1879
+      ],
+      [
+        5,
+        "other_decay",
+        0,
+        1457
+      ]
+    ],
+    "all_ok": true
+  },
+  "split_counts": {
+    "train": 25033,
+    "test": 5366,
+    "val": 5366
+  },
+  "split_class_counts": {
+    "train": {
+      "signal": 24711,
+      "continuum": 322
+    },
+    "val": {
+      "signal": 5295,
+      "continuum": 71
+    },
+    "test": {
+      "signal": 5297,
+      "continuum": 69
+    }
+  },
+  "groups_crossing_splits": 0,
+  "n_groups": 35765
+}

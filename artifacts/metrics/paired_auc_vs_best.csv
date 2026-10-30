@@ -1,0 +1,6 @@
+comparison,model,auc_diff,ci_lo,ci_hi,ci_excludes_zero
+forest|full minus majority|full,majority,0.004868766296481697,-0.06590297214994544,0.07323703873945604,False
+forest|full minus single_cut|full,single_cut,-0.06195467491853468,-0.15210263944863522,0.034003421406155615,False
+forest|full minus logreg|full,logreg,-0.0246926753727158,-0.10178724353133979,0.0555271578388642,False
+forest|full minus tree|full,tree,-0.01695654909943556,-0.10036635448558515,0.06373063232401165,False
+forest|full minus boosting|full,boosting,-0.04004454257673884,-0.11201650920811076,0.030686531616200503,False

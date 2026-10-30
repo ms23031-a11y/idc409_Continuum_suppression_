@@ -1,0 +1,7 @@
+Model,Signal P,Signal R,Signal F1,Continuum P,Continuum R,Continuum F1
+Majority class,0.987,1.000,0.994,0.000,0.000,0.000
+Single-feature cut,0.988,0.909,0.947,0.018,0.130,0.032
+Logistic regression,0.987,0.904,0.944,0.015,0.116,0.027
+Decision tree,0.987,0.934,0.960,0.011,0.058,0.019
+Random forest,0.987,0.933,0.959,0.011,0.058,0.019
+Gradient boosting (HistGB),0.988,0.907,0.946,0.018,0.130,0.032

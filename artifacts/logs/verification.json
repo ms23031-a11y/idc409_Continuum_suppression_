@@ -1,0 +1,106 @@
+{
+  "csv_sha256_matches_audit": true,
+  "results_match_current_config": true,
+  "database_checks": {
+    "raw_table_rowcount_matches_csv": true,
+    "raw_table_values_identical_to_csv": true,
+    "raw_type_and_index_identical": true,
+    "events_features_equal_raw": true,
+    "primary_view_rows_equal_pandas_subset": true,
+    "primary_view_only_intended_codes": true,
+    "target_matches_pandas_mapping_on_primary": true,
+    "target_null_for_excluded_rows": true,
+    "primary_rows_have_target_and_split": true,
+    "excluded_rows_marked_excluded": true,
+    "type_mapping_counts_match_csv": true,
+    "no_type_minus1_rows_created": true,
+    "sql_count_by_split": {
+      "excluded": 34841,
+      "test": 5366,
+      "train": 25033,
+      "val": 5366
+    },
+    "sql_count_by_role": {
+      "continuum": 462,
+      "other_decay": 34841,
+      "signal": 35303
+    },
+    "mapping_rows": [
+      [
+        -1,
+        "continuum",
+        1,
+        0
+      ],
+      [
+        0,
+        "continuum",
+        1,
+        462
+      ],
+      [
+        1,
+        "signal",
+        1,
+        35303
+      ],
+      [
+        2,
+        "other_decay",
+        0,
+        23333
+      ],
+      [
+        3,
+        "other_decay",
+        0,
+        8172
+      ],
+      [
+        4,
+        "other_decay",
+        0,
+        1879
+      ],
+      [
+        5,
+        "other_decay",
+        0,
+        1457
+      ]
+    ],
+    "all_ok": true
+  },
+  "database_all_ok": true,
+  "only_intended_codes_in_experiment": true,
+  "selection_counts_match_csv": true,
+  "no_type_minus1_rows_invented": true,
+  "no_excluded_row_in_any_split": true,
+  "excluded_row_counts_recorded": true,
+  "split_csv_matches_db": true,
+  "no_group_crosses_splits": true,
+  "row_ids_preserved_and_unique": true,
+  "class_proportion_max_deviation_across_splits": 0.0003138003967277925,
+  "splits_stratified_by_class": true,
+  "every_split_has_continuum": true,
+  "leakage_columns_not_in_predictors": true,
+  "predictions_only_val_test_primary_rows": true,
+  "bundle_vs_saved_predictions_max_abs_diff": 3.3306690738754696e-16,
+  "saved_models_reproduce_saved_predictions": true,
+  "recomputed_test_metrics_match_reported": true,
+  "signal_efficiency_and_continuum_rejection_use_correct_class_denominators": true,
+  "operating_thresholds_reproduced_from_validation_only_and_meet_efficiency_floor": true,
+  "bundles_have_no_leaky_columns": true,
+  "best_model_chosen_by_validation_auc": true,
+  "hyperparameters_are_validation_winners": true,
+  "full_vs_reduced_follow_same_protocol": true,
+  "scored_row_counts_match_training_log": true,
+  "inference_works": true,
+  "inference_matches_saved_test_scores": true,
+  "inference_uses_frozen_operating_threshold": true,
+  "missing_column_rejected": true,
+  "inf_rejected": true,
+  "non_numeric_rejected": true,
+  "nan_rejected": true,
+  "ALL_PASSED": true
+}
