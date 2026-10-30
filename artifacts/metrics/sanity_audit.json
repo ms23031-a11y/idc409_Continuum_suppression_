@@ -1,0 +1,108 @@
+{
+  "label_alignment": {
+    "target_equals_(type==1)": true,
+    "database_target_equals_pandas_target": true,
+    "types_in_experiment": [
+      0,
+      1
+    ],
+    "n_signal": 35303,
+    "n_continuum": 462,
+    "all_saved_models_have_classes_[0,1]_so_predict_proba[:,1]_is_P(signal)": true,
+    "positive_class_probe_auc_on_toy_task(should_be_~1)": 0.9999237107110162
+  },
+  "metrics_recomputed_with_sklearn": {
+    "all_match": true,
+    "max_abs_difference": 2.220446049250313e-16
+  },
+  "score_direction": {
+    "majority|full": {
+      "auc": 0.5,
+      "auc_if_scores_reversed": 0.5
+    },
+    "single_cut|full": {
+      "auc": 0.5668234412150164,
+      "auc_if_scores_reversed": 0.4331765587849836
+    },
+    "logreg|full": {
+      "auc": 0.5295614416691975,
+      "auc_if_scores_reversed": 0.4704385583308025
+    },
+    "tree|full": {
+      "auc": 0.5218253153959173,
+      "auc_if_scores_reversed": 0.47817468460408274
+    },
+    "forest|full": {
+      "auc": 0.5048687662964817,
+      "auc_if_scores_reversed": 0.4951312337035183
+    },
+    "boosting|full": {
+      "auc": 0.5449133088732205,
+      "auc_if_scores_reversed": 0.45508669112677946
+    },
+    "note": "no model is strongly anti-correlated with the label (an inverted score would show AUC far below 0.5)"
+  },
+  "negative_control": {
+    "logreg": {
+      "validation_auc_with_shuffled_training_labels": [
+        0.5417600978866589,
+        0.5369535437364508,
+        0.5515514237454947
+      ]
+    },
+    "boosting": {
+      "validation_auc_with_shuffled_training_labels": [
+        0.4885209272632965,
+        0.5482557288965141,
+        0.5549082977563208
+      ]
+    }
+  },
+  "positive_control": {
+    "task": "type 1 vs type 2 (excluded code), balanced 4000/4000 sample, same features/splitting/models/metrics",
+    "validation_auc": {
+      "logreg": 0.9067583333333332,
+      "boosting": 0.923175
+    },
+    "note": "sanity control only; not part of the experiment; the test set is not used"
+  },
+  "pooled_train_val_5fold_cv": {
+    "logreg": {
+      "fold_auc": [
+        0.5204696725023282,
+        0.5813292721255319,
+        0.525414540614539,
+        0.5541565857167265,
+        0.5651857169104295
+      ],
+      "oof_auc": 0.5490644025562996,
+      "oof_auc_ci95": [
+        0.5192624855012034,
+        0.5780955874134757
+      ],
+      "n_continuum_pooled": 393,
+      "n_signal_pooled": 30006
+    },
+    "boosting": {
+      "fold_auc": [
+        0.5114983039841421,
+        0.4868450195009693,
+        0.5081178453380133,
+        0.48471246353455866,
+        0.4871495776344968
+      ],
+      "oof_auc": 0.49567711563709316,
+      "oof_auc_ci95": [
+        0.46652274082927264,
+        0.5248466612869114
+      ],
+      "n_continuum_pooled": 393,
+      "n_signal_pooled": 30006
+    }
+  },
+  "development_disclosure": "The held-out test metrics of this corrected run were inspected while developing and debugging the reporting and the score-file precision fix. No model, hyper-parameter, feature set or threshold was changed in response to test results (they are fixed by validation data: see the isolation check). An earlier, different task (type 1 vs all other codes) used a different split of a different subset; its rows overlap with the current rows, so the current test rows are not strictly untouched by earlier work.",
+  "verdict": {
+    "implementation_problem_found": false,
+    "all_checks_consistent_with_a_correct_pipeline": true
+  }
+}

@@ -27,5 +27,12 @@
   "README paths exist": true,
   "README CLI `src.predict` works": true,
   "CLI rejects missing column with clear message": true,
+  "'highest test AUC' claims match saved results (all variants / full-feature)": true,
+  "no 'highest AUC' claim contradicted by a higher reduced/filtered variant": true,
+  "report has pipeline-check section and test-exposure / event-leakage disclosures": true,
+  "README gives notebook run commands": true,
+  "notebook setup cell uses project-root discovery (no fragile abspath('..'))": true,
+  "notebook execution counts are consecutive 1..N (fresh kernel, run in order)": true,
+  "checklist addresses which models are mandatory": true,
   "ALL_PASSED": true
 }

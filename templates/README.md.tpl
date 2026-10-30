@@ -56,11 +56,25 @@ cp /path/to/data_hep.csv data/raw/data_hep.csv
 python -m src.run_all                      # full regeneration incl. verification, notebook, report, README tables (~20-30 min on 2 CPU cores)
 python -m src.run_all --docs-only          # re-render report, README tables, notebook from saved results (~2 min)
 python -m pytest -q                        # tests
-streamlit run app.py                       # optional demo (uses the saved best model and its frozen threshold)
+streamlit run app.py                       # demo: upload a CSV of the 59 feature columns (no `type` column needed); uses the saved best model and its frozen threshold
 python -m src.predict --input features.csv --output scores.csv    # CLI inference
 ```
 
-`src.run_all` runs: audit + SQLite + splits (`src.prepare`), EDA, training with validation-based tuning and threshold selection (`src.train`), evaluation (`src.evaluate`), split repeats, other-decays diagnostic, feature dictionary, verification (`src.verify`), the test-isolation check, pytest, the Streamlit browser test, then `src.docs` (README tables, report, viva guide, executed notebook, PDF) and `src.verify_docs`. Every generated document carries the configuration fingerprint; if the configuration or data change and results are not regenerated, `src.docs` and `src.verify` stop with a "STALE RESULTS" error instead of reusing old numbers. Student details come from `configs/experiment.json` and are preserved. Tested with Python 3.13, scikit-learn 1.9.1.
+`src.run_all` runs: audit + SQLite + splits (`src.prepare`), EDA, training with validation-based tuning and threshold selection (`src.train`), evaluation (`src.evaluate`), split repeats, other-decays diagnostic, feature dictionary, verification (`src.verify`), the pipeline sanity audit (`src.sanity_audit`), the test-isolation check, pytest, the Streamlit browser test, then `src.docs` (README tables, report, viva guide, executed notebook, PDF) and `src.verify_docs`. Every generated document carries the configuration fingerprint; if the configuration or data change and results are not regenerated, `src.docs` and `src.verify` stop with a "STALE RESULTS" error instead of reusing old numbers. Student details come from `configs/experiment.json` and are preserved. Tested with Python 3.13, scikit-learn 1.9.1.
+
+## Run the notebook
+
+```bash
+pip install -r requirements.txt
+jupyter lab                                  # open notebooks/continuum_suppression.ipynb, Kernel -> Restart & Run All
+# or, headless, from the project folder:
+jupyter nbconvert --to notebook --execute --inplace notebooks/continuum_suppression.ipynb
+```
+The first cell finds the project root by itself (start Jupyter anywhere inside the project, or set `CONTINUUM_ROOT=/path/to/project`) and is safe to re-run. It needs the same Python environment as `requirements.txt` and the results already in `artifacts/` (included, or regenerate with `python -m src.run_all`). `python -m src.run_all --docs-only` rebuilds and re-executes the notebook from a clean kernel with outputs cleared.
+
+## Why is performance near chance? (checked)
+
+`src/sanity_audit.py` found no implementation problem: labels and the positive-class column are aligned, metrics recompute exactly with independent scikit-learn functions, shuffled-label controls give AUC {{sa_neg_range}}, and the same pipeline reaches validation AUC {{sa_pos_logreg}}/{{sa_pos_boost}} on a learnable task. Pooled train+validation cross-validation ({{sa_cv_n_con}} continuum events, no test data) gives out-of-fold AUC {{sa_cv_logreg}} (logistic) and {{sa_cv_boost}} (boosting). No physical separation is claimed. Details: report section 5.
 
 ## Method in brief
 
@@ -74,7 +88,8 @@ SQLite stores the untouched raw table; role, target and split columns are filled
 
 1. The mapping is instructor-provided and unverifiable from the data; only type 0 continuum rows exist (no type -1).
 2. Only {{test_con}} continuum events in the test set ({{train_con}} train, {{val_con}} validation): wide intervals and noisy validation-based choices.
-3. No physical event identifier; simulated data with unverified generation details; SVM/neural networks not attempted.
-4. Feature importance is associational, not causal.
+3. No physical event identifier, so **event-level leakage cannot be ruled out**; simulated data with unverified generation details; SVM/neural networks not attempted (the assignment lists SVM *or* gradient boosting; no single model is mandatory).
+4. Test-set exposure: {{sa_disclosure}}
+5. Feature importance is associational, not causal.
 
 An earlier `type == 1` vs all-other-codes analysis is a different task and is kept only as a historical record (`reports/historical_type1_vs_all_others.md`). Reference for project organisation: https://github.com/winteriscoming07/DS_leaf (structure only; no code or text reused).

@@ -109,7 +109,22 @@ Over {{n_splits}} different splits (frozen hyper-parameters) the model ordering 
 
 ![Fraction of rows accepted as signal by the final model, by original code.](../artifacts/figures/15_other_decays_diagnostic.png){width=70%}
 
-# 5. Feature reduction
+# 5. Is the near-chance result an implementation problem? (pipeline checks)
+
+Before accepting the result I checked the pipeline (`src/sanity_audit.py`). None of these checks uses the test set for any new fitting; nothing was tuned in response to them.
+
+* **Label alignment and filtering.** The target equals `(type == 1)` for exactly the codes {1, 0, -1}; the SQL-derived target equals the pandas target; no excluded row is in any split (verification checks). Every saved model has `classes_ == [0, 1]`, so `predict_proba[:, 1]` is the probability of *signal*; a toy task confirms the same code path returns AUC {{sa_toy_auc}} for a learnable label. Scores are not inverted: reversing a model's scores turns its AUC `a` into `1 - a`, and no full-feature model is far from 0.5 in either direction (AUC range {{auc_min}}-{{auc_max}}), so there is no hidden inverted separation.
+* **Metrics.** All accuracy, balanced accuracy, macro-F1, efficiency, rejection, precision and F1 values were recomputed from the saved scores with independent scikit-learn functions: maximum difference {{sa_metric_diff}}.
+* **Class imbalance.** Training-only class weighting was compared on validation data for every learned model (Table F); the near-chance result does not depend on it.
+* **Negative control.** Training the same models on *shuffled* training labels gives validation AUC {{sa_neg_range}}, i.e. what no information looks like.
+* **Positive control.** The same feature loading, splitting, models and metric code applied to a learnable task (type 1 against the excluded other-decay type 2, used here only as a sanity control) gives validation AUC {{sa_pos_logreg}} (logistic regression) and {{sa_pos_boost}} (boosting). So the pipeline can find separation when the features contain it.
+* **A larger continuum sample.** Pooling train and validation ({{sa_cv_n_con}} continuum and {{sa_cv_n_sig}} signal events; the test set is not touched) and running stratified 5-fold cross-validation with the already-chosen hyper-parameters:
+
+{{sa_cv_rows}}
+
+Conclusion: no implementation problem was found; the near-chance performance is what these features give for the instructor-provided classes. I make **no claim of physical separation**. The predicted "signal-like" class means only "score above the threshold": it is not a known signal label, and at the operating point most of what is called signal-like is true signal only because signal outnumbers continuum {{sig_ratio}} to 1.
+
+# 6. Feature reduction
 
 ![Permutation importance (validation) and choice of the reduced-set size. The validation AUC is noisy because of the few continuum events.](../artifacts/figures/16_feature_importance_reduction.png){width=100%}
 
@@ -121,20 +136,21 @@ Reduced set ({{k_sel}} features): {{reduced_list}}. `{{top1}}` has the largest i
 
 AUC change versus the full set - correlation-filtered ({{n_corr}} features): {{corr_sentence}}. Reduced ({{k_sel}} features): {{reduced_sentence}}. The reduced list was chosen with a boosting model on noisy validation data, so differences for other models should not be over-read. Permutation importance describes what the fitted model uses; correlated features share importance; it carries no causal meaning.
 
-# 6. How this differs from the earlier analysis
+# 7. How this differs from the earlier analysis
 
 An earlier version of this project classified `type == 1` against **all** other codes, which put other decays (codes 2-5, 34,841 rows) into the negative class. Those results were not a signal-versus-continuum measurement and are **not** used anywhere above. They are kept only as a separate historical record (`reports/historical_type1_vs_all_others.md`) and must never be compared with the numbers in this report: the task, the class sizes ({{n_signal}} vs {{n_continuum}} instead of 35,303 vs 35,303) and the meaning of the negative class are all different.
 
-# 7. Limitations
+# 8. Limitations
 
 1. **Mapping provenance.** The code meanings are instructor-provided via the student and cannot be verified from the data. Only type 0 continuum rows exist; no type -1 rows are present.
 2. **Very few continuum events:** {{train_con}} / {{val_con}} / {{test_con}} in train / validation / test. Intervals are wide, validation-based choices (model, reduced features, threshold) are noisy, and the results could change materially with another split (see the split-repeat table).
-3. No physical event identifier exists; rows from the same event could in principle fall into different splits. Duplicate feature vectors were checked (none).
+3. No physical event identifier exists, so **event-level leakage cannot be ruled out**: rows from the same physical event could in principle fall into different splits. Only exact duplicate feature vectors were checked (none exist).
 4. Bounded tuning budgets; SVM and neural networks were not attempted. Class weighting was compared; resampling was not used.
 5. Simulated data; the generation details were not verified; the feature definitions come from Belle II documentation and variable names (the `__bc` suffix and KSFW indices were not independently checked).
 6. Intervals treat the trained models as fixed and exclude training-set variability.
+7. **Test-set exposure.** {{sa_disclosure}}
 
-# 8. Reproducibility and verification (what was and was not tested)
+# 9. Reproducibility and verification (what was and was not tested)
 
 `python -m src.run_all` regenerates, from the raw CSV: the audit, SQLite tables and splits; all models, predictions and metrics; feature reduction and figures; the split repeats and diagnostics; verification; the executed notebook; this report (and its PDF when pandoc and weasyprint are installed); and the result tables in the README. Every generated document carries the configuration fingerprint and the build stops with a "STALE RESULTS" error if results do not match the configuration.
 

@@ -9,7 +9,7 @@
 
 ## Main results (held-out test set: 5,297 signal, 69 continuum events)
 
-The validation-selected model (Random forest) has test ROC-AUC 0.505 (close to chance); its 95% interval 0.434-0.573 includes 0.5 (chance). The highest test AUC of any model is 0.567 (Single-feature cut, interval 0.504-0.630, which excludes 0.5 only barely; it was not the validation choice). Models whose AUC interval includes 0.5: Logistic regression, Decision tree, Random forest, Gradient boosting. On the instructor-provided mapping, at the validation-chosen operating point (signal efficiency floor 90%) the validation-selected model keeps 93.3% of true signal and rejects 5.8% of true continuum on the test set (only 69 continuum events; 95% exact interval 1.6%, 14.2%). For comparison, a score with no discrimination would reject about 6.7% at this efficiency.
+The validation-selected model (Random forest) has test ROC-AUC 0.505 (close to chance); its 95% interval 0.434-0.573 includes 0.5 (chance). The highest test AUC among full-feature models is 0.567 (Single-feature cut, interval 0.504-0.630, which excludes 0.5 only barely; it was not the validation choice). Counting every feature-set variant (full, correlation-filtered, reduced), the highest test AUC is 0.568 (Decision tree, reduced features, interval 0.521-0.614); it too was not chosen on validation data. With 15 model / feature-set combinations scored on the same 69 continuum test events, one interval that excludes 0.5 is expected by chance alone and is not evidence of real separation. Among full-feature learned classifiers the AUC interval includes 0.5 for: Logistic regression, Decision tree, Random forest, Gradient boosting. On the instructor-provided mapping, at the validation-chosen operating point (signal efficiency floor 90%) the validation-selected model keeps 93.3% of true signal and rejects 5.8% of true continuum on the test set (only 69 continuum events; 95% exact interval 1.6%, 14.2%). For comparison, a score with no discrimination would reject about 6.7% at this efficiency.
 
 **Flag for the instructor.** Under the instructor-provided mapping the type-0 events (the only continuum rows in the file; 0 type -1 rows exist) are, in these 59 features, nearly the same as the signal events: the best single feature (`thrustOm`) reaches an AUC of only 0.562 on the training rows, and no model separates the classes well. Physically, continuum (light-quark/charm) events are expected to be more jet-like (higher R2 and thrust, cosTBTO peaked at 1) than B-pair signal events; the type-0 events show the *signal-like* pattern instead (figure 3 and 4). This report does not change the mapping, but the data do not show the separation that a signal-versus-continuum task normally has, so it would be worth confirming with the instructor that code 0 really is continuum and that no type -1 data were meant to be included.
 
@@ -86,11 +86,25 @@ cp /path/to/data_hep.csv data/raw/data_hep.csv
 python -m src.run_all                      # full regeneration incl. verification, notebook, report, README tables (~20-30 min on 2 CPU cores)
 python -m src.run_all --docs-only          # re-render report, README tables, notebook from saved results (~2 min)
 python -m pytest -q                        # tests
-streamlit run app.py                       # optional demo (uses the saved best model and its frozen threshold)
+streamlit run app.py                       # demo: upload a CSV of the 59 feature columns (no `type` column needed); uses the saved best model and its frozen threshold
 python -m src.predict --input features.csv --output scores.csv    # CLI inference
 ```
 
-`src.run_all` runs: audit + SQLite + splits (`src.prepare`), EDA, training with validation-based tuning and threshold selection (`src.train`), evaluation (`src.evaluate`), split repeats, other-decays diagnostic, feature dictionary, verification (`src.verify`), the test-isolation check, pytest, the Streamlit browser test, then `src.docs` (README tables, report, viva guide, executed notebook, PDF) and `src.verify_docs`. Every generated document carries the configuration fingerprint; if the configuration or data change and results are not regenerated, `src.docs` and `src.verify` stop with a "STALE RESULTS" error instead of reusing old numbers. Student details come from `configs/experiment.json` and are preserved. Tested with Python 3.13, scikit-learn 1.9.1.
+`src.run_all` runs: audit + SQLite + splits (`src.prepare`), EDA, training with validation-based tuning and threshold selection (`src.train`), evaluation (`src.evaluate`), split repeats, other-decays diagnostic, feature dictionary, verification (`src.verify`), the pipeline sanity audit (`src.sanity_audit`), the test-isolation check, pytest, the Streamlit browser test, then `src.docs` (README tables, report, viva guide, executed notebook, PDF) and `src.verify_docs`. Every generated document carries the configuration fingerprint; if the configuration or data change and results are not regenerated, `src.docs` and `src.verify` stop with a "STALE RESULTS" error instead of reusing old numbers. Student details come from `configs/experiment.json` and are preserved. Tested with Python 3.13, scikit-learn 1.9.1.
+
+## Run the notebook
+
+```bash
+pip install -r requirements.txt
+jupyter lab                                  # open notebooks/continuum_suppression.ipynb, Kernel -> Restart & Run All
+# or, headless, from the project folder:
+jupyter nbconvert --to notebook --execute --inplace notebooks/continuum_suppression.ipynb
+```
+The first cell finds the project root by itself (start Jupyter anywhere inside the project, or set `CONTINUUM_ROOT=/path/to/project`) and is safe to re-run. It needs the same Python environment as `requirements.txt` and the results already in `artifacts/` (included, or regenerate with `python -m src.run_all`). `python -m src.run_all --docs-only` rebuilds and re-executes the notebook from a clean kernel with outputs cleared.
+
+## Why is performance near chance? (checked)
+
+`src/sanity_audit.py` found no implementation problem: labels and the positive-class column are aligned, metrics recompute exactly with independent scikit-learn functions, shuffled-label controls give AUC 0.49-0.55, and the same pipeline reaches validation AUC 0.907/0.923 on a learnable task. Pooled train+validation cross-validation (393 continuum events, no test data) gives out-of-fold AUC 0.549 [0.519, 0.578] (logistic) and 0.496 [0.467, 0.525] (boosting). No physical separation is claimed. Details: report section 5.
 
 ## Method in brief
 
@@ -100,8 +114,10 @@ SQLite stores the untouched raw table; role, target and split columns are filled
 
 * `python -m src.verify` ran **31 automated checks**; all passed: True. They cover: CSV checksum; SQLite raw table identical to the CSV; SQL-derived roles/targets equal the pandas mapping; the `primary_events` view equals the modelling subset; only codes 1, 0, -1 in the experiment; no excluded row (codes 2-5) in any train/validation/test split and no type -1 row invented; stratified class proportions in every split and at least one continuum event in each; no label/index/identifier column in any predictor list or bundle; every saved bundle reproduces its saved validation and test scores (max absolute difference 3.3e-16); test metrics, signal efficiency, continuum rejection (explicit class denominators), exact intervals and thresholds recompute independently from saved scores; thresholds re-derive from validation scores only and meet the efficiency floor on validation; hyper-parameters equal the validation-AUC winners; full / correlation-filtered / reduced comparisons used identical search budgets, seed and rules; inference works, uses the frozen threshold and rejects missing, non-numeric, missing-value and infinite inputs.
 * **Test-set isolation check:** test rows' labels and feature values were deliberately scrambled, then feature reduction, tuning of single_cut, logreg, tree, boosting and threshold selection were re-run from scratch; all selected features, hyper-parameters, thresholds and validation scores were identical (True), so these choices do not read test data.
-* `pytest`: 10 passed, 0 failed.
-* **Streamlit upload flow** (real browser via Playwright against a locally started app that loads the saved model and threshold): valid CSV scored (True); CSV missing a feature column rejected with a clear message (True); missing value rejected (True); non-numeric value rejected (True).
+* `pytest`: 16 passed, 0 failed.
+* **Streamlit upload flow** (real browser via Playwright against a locally started app that loads the saved model and frozen threshold): a valid CSV *without* the `type` or index columns was uploaded and scored (True); the downloaded predictions file matched the saved pipeline's scores and used the frozen threshold (True / True); a CSV that also contains `type` was scored with that column ignored (True); invalid CSVs were rejected with clear messages: missing feature column (True), missing value (True), non-numeric value (True). Inference never needs the true label.
+* **Pipeline sanity audit** (`src.sanity_audit`, no new fitting on test data): label alignment and positive-class column (True); all reported metrics recomputed with independent scikit-learn functions, max difference 2.2e-16 (True); negative control (shuffled training labels) gives validation AUC 0.49-0.55; positive control (a learnable task through the same code) gives validation AUC 0.907 / 0.923; pooled train+validation 5-fold CV is reported in section 5. Overall: no implementation problem found (True).
+* **Notebook:** executed from a fresh kernel with all outputs cleared first; every code cell has an execution count, there are zero error cells, and the setup cell was tested from five different start directories, re-run twice (no repeated directory changes, no duplicate `sys.path` entries), and outside the project (clear error; `CONTINUUM_ROOT` override).
 * **Full retraining:** this whole analysis (preprocessing, splits, feature reduction, tuning, thresholds, evaluation, repeats) was re-run from the raw CSV for the corrected task; no fitted model, threshold or selection from the earlier `type == 1` versus all-others task was reused.
 * **Not tested:** other operating systems or Python versions; the documents on a machine without pandoc/weasyprint; independent checking of the feature definitions against basf2 source code; the instructor's mapping itself (it cannot be verified from the data files).
 
@@ -109,7 +125,8 @@ SQLite stores the untouched raw table; role, target and split columns are filled
 
 1. The mapping is instructor-provided and unverifiable from the data; only type 0 continuum rows exist (no type -1).
 2. Only 69 continuum events in the test set (322 train, 71 validation): wide intervals and noisy validation-based choices.
-3. No physical event identifier; simulated data with unverified generation details; SVM/neural networks not attempted.
-4. Feature importance is associational, not causal.
+3. No physical event identifier, so **event-level leakage cannot be ruled out**; simulated data with unverified generation details; SVM/neural networks not attempted (the assignment lists SVM *or* gradient boosting; no single model is mandatory).
+4. Test-set exposure: The held-out test metrics of this corrected run were inspected while developing and debugging the reporting and the score-file precision fix. No model, hyper-parameter, feature set or threshold was changed in response to test results (they are fixed by validation data: see the isolation check). An earlier, different task (type 1 vs all other codes) used a different split of a different subset; its rows overlap with the current rows, so the current test rows are not strictly untouched by earlier work.
+5. Feature importance is associational, not causal.
 
 An earlier `type == 1` vs all-other-codes analysis is a different task and is kept only as a historical record (`reports/historical_type1_vs_all_others.md`). Reference for project organisation: https://github.com/winteriscoming07/DS_leaf (structure only; no code or text reused).

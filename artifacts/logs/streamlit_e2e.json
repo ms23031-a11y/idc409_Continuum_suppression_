@@ -1,6 +1,9 @@
 {
-  "valid_upload_ok": true,
-  "valid_upload_label_text": true,
+  "valid_upload_without_type_column_scored": true,
+  "app_states_mapping_and_heldout_performance": true,
+  "download_ok": true,
+  "download_uses_frozen_threshold": true,
+  "valid_upload_with_extra_type_column_scored": true,
   "missing_column_rejected": true,
   "nan_rejected": true,
   "non_numeric_rejected": true,

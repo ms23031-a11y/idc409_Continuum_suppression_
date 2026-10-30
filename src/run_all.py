@@ -6,7 +6,7 @@ import json, re, subprocess, sys
 from .paths import LOG, ROOT
 
 ANALYSIS = ["src.prepare", "src.eda", "src.train", "src.evaluate", "src.repeats", "src.other_decays", "src.feature_dictionary"]
-CHECKS = ["src.verify", "src.isolation"]
+CHECKS = ["src.verify", "src.sanity_audit", "src.isolation"]
 
 
 def sh(args, **kw):

@@ -4,6 +4,34 @@ from nbconvert.preprocessors import ExecutePreprocessor
 from .paths import ROOT
 
 
+SETUP_CELL = """# --- Setup: locate the project root reliably (safe to re-run any number of times) ---------------------------------
+# Works whether Jupyter was started in the project root, in notebooks/, or anywhere inside the project tree.
+# If the notebook is opened outside the project, set the environment variable CONTINUUM_ROOT to the project folder.
+import os, sys, json
+from pathlib import Path
+
+def find_project_root():
+    env = os.environ.get("CONTINUUM_ROOT")
+    starts = ([Path(env).expanduser()] if env else []) + [Path.cwd(), *Path.cwd().parents]
+    for base in starts:
+        for cand in [base] + sorted(p for p in base.glob("*") if p.is_dir())[:50]:     # the folder itself, or a direct child
+            if all((cand / m).exists() for m in ("configs/experiment.json", "src/prepare.py", "src/narrative.py", "templates/report.md.tpl")):   # files unique to this project
+                return cand.resolve()
+    raise RuntimeError("Project root not found (looked for configs/experiment.json, src/prepare.py and templates/ starting from "
+                       f"{Path.cwd()}). Start Jupyter inside the project folder or set CONTINUUM_ROOT=/path/to/continuum_suppression.")
+
+PROJECT_ROOT = find_project_root()
+if str(PROJECT_ROOT) not in sys.path: sys.path.insert(0, str(PROJECT_ROOT))     # no duplicate entries on re-run
+os.chdir(PROJECT_ROOT)                                                           # absolute path -> idempotent
+
+import numpy as np, pandas as pd
+from IPython.display import Image, Markdown, display
+from src import data, database, predict
+from src.paths import ART, FIG, MET, MOD, LOG
+pd.set_option("display.width", 170); pd.set_option("display.max_columns", 40)
+print("project root:", PROJECT_ROOT)"""
+
+
 def build(F):
     C = []
     md = lambda s: C.append(nbf.v4.new_markdown_cell(s)); code = lambda s: C.append(nbf.v4.new_code_cell(s))
@@ -14,18 +42,15 @@ def build(F):
 
 > **Label mapping.** The code meanings come from the instructor's clarification relayed by the student: type +1 = signal; type 0 or -1 = continuum; codes 2-5 = other decays. This cannot be verified from the data files. Codes 2-5 are neither category, so I excluded them: an *analysis decision*, not an instructor instruction. The CSV has {F['n_signal']} signal, {F['n_continuum']} continuum ({F['cont_codes_present']}) and **{F['n_minus1']} type -1 rows** - none were invented. The sample is {F['sig_frac']} signal, so accuracy alone is misleading.
 
-Notebook map: 1 data & audit - 2 SQLite - 3 EDA - 4 splits - 5 models - 6 evaluation - 7 reproducing from the saved bundle - 8 feature reduction - 9 robustness - 10 conclusions.
+Notebook map: 1 data & audit - 2 SQLite - 3 EDA - 4 splits - 5 models - 6 evaluation - 7 reproducing from the saved bundle - 8 feature reduction - 9 pipeline checks and robustness - 10 conclusions.
+
+**How to run this notebook.** From the project folder: `pip install -r requirements.txt`, then `jupyter lab` (or `jupyter nbconvert --to notebook --execute --inplace notebooks/continuum_suppression.ipynb`). Use a kernel of the same Python environment. The first code cell finds the project root automatically (start Jupyter anywhere inside the project, or set `CONTINUUM_ROOT`) and can be re-run safely. The notebook reads the results saved by `python -m src.run_all` (already included); the original CSV must be at `data/raw/data_hep.csv` only if you regenerate them.
 *Generated and executed by `python -m src.docs` from saved results (config fingerprint `{F['config_sha'][:16]}`).*""")
-    code(f"""import json, sys, os
-sys.path.insert(0, os.path.abspath('..')); os.chdir(os.path.abspath('..'))
-import numpy as np, pandas as pd
-from IPython.display import Image, Markdown, display
-from src import data, database, predict
-from src.paths import ART, FIG, MET, MOD, LOG
-pd.set_option('display.width', 170); pd.set_option('display.max_columns', 40)
-cfg = data.load_config(); show = lambda n, w=900: display(Image(str(FIG / n), width=w))
+    code(SETUP_CELL)
+    code(f"""cfg = data.load_config(); show = lambda n, w=900: display(Image(str(FIG / n), width=w))
 tlog = json.load(open(LOG / 'training_log.json'))
-assert tlog['config_sha256'] == data.config_fingerprint(cfg), 'STALE RESULTS: re-run python -m src.run_all'     # stale-output guard
+# stale-output guard: this notebook must describe results produced under the CURRENT configuration
+assert tlog['config_sha256'] == data.config_fingerprint(cfg), 'STALE RESULTS: re-run python -m src.run_all'
 print('student:', cfg['student']['name'], cfg['student']['roll'], '| seed', cfg['seed'], '| config fingerprint', data.config_fingerprint(cfg)[:16])
 print(json.dumps(cfg['label_mapping'], indent=1)); print(json.dumps(cfg['operating_point'], indent=1))""")
     md("## 1. Data loading, selection and audit\nThe original CSV is never modified. Provenance: supplied as the course's Belle II sample; how it was generated was not independently verified.")
@@ -104,7 +129,16 @@ show('16_feature_importance_reduction.png', 1100)""")
     code("display(pd.read_csv(MET/'full_vs_reduced_table.csv')); show('17_full_vs_reduced.png', 1000)")
     md(f"""**Method:** (1) drop one of each highly correlated pair (|Spearman| >= {F['corr_thr']}, keep the more separating feature, training rows); (2) rank by permutation importance of a class-weighted gradient-boosting model on *validation* data; (3) {F['crit']}. All four learned models were then re-tuned and re-evaluated with the identical protocol.
 **Result:** correlation-filtered set ({F['n_corr']} features), AUC change vs full: {F['corr_sentence']}. Reduced set ({F['k_sel']} features): {F['reduced_sentence']}. With so few continuum events the validation AUC used for these choices is noisy, so differences should not be over-read; importance is associational.""")
-    md("## 9. Robustness: split variability")
+    md("## 9. Pipeline checks (is the weak result a bug?) and robustness")
+    code("""sa = json.load(open(MET / 'sanity_audit.json'))
+print('label alignment / positive class:', json.dumps(sa['label_alignment'], indent=1))
+print('metrics recomputed with independent sklearn functions:', sa['metrics_recomputed_with_sklearn'])
+print('negative control (shuffled training labels), validation AUC:', json.dumps(sa['negative_control']))
+print('positive control (learnable task, same code path), validation AUC:', sa['positive_control']['validation_auc'], '|', sa['positive_control']['task'])
+print('pooled train+validation 5-fold CV (test set NOT used):'); print(json.dumps(sa['pooled_train_val_5fold_cv'], indent=1))
+print('verdict:', sa['verdict']); print(); print(sa['development_disclosure'])""")
+    md(f"**Reading the checks.** Shuffled training labels give validation AUC {F['sa_neg_range']} (no information); the same pipeline reaches {F['sa_pos_logreg']} / {F['sa_pos_boost']} on a learnable task, so it can find separation when it exists; metrics recompute exactly with independent library functions; pooled train+validation CV ({F['sa_cv_n_con']} continuum events, no test data) gives out-of-fold AUC {F['sa_cv_logreg']} (logistic) and {F['sa_cv_boost']} (boosting). No implementation problem was found, and **no physical separation is claimed**. Event-level leakage cannot be ruled out because no physical event identifier exists. {F['sa_disclosure']}")
+    md("### Split variability")
     code("display(pd.read_csv(MET/'seed_repeats_summary.csv')); display(pd.read_csv(MET/'seed_repeats.csv').pivot_table(index='model', columns='seed', values='continuum_rej').round(3))")
     md(f"Re-splits with further seeds and *frozen* hyper-parameters (operating threshold re-selected on each split's validation set). The spread of continuum rejection across splits shows how much a single {F['test_con']}-event test set can move; the best model's AUC over {F['n_splits']} splits is {F['seed_best_auc']} and its continuum rejection {F['seed_best_rej']}.")
     md("## 10. Conclusions and limitations")
@@ -114,6 +148,7 @@ show('16_feature_importance_reduction.png', 1100)""")
 * {F['paired_sentence']}
 * Feature reduction: correlation-filtered set - {F['corr_sentence']}; reduced set - {F['reduced_sentence']}.
 {('* ' + F['flag_block']) if F['flag_block'] else ''}
+* Pipeline checks found no implementation problem (section 9); "signal-like" means only 'score above the threshold', not a known signal label. {F['sa_disclosure']}
 * **Not established:** the mapping itself; absence of shared physical events across splits; any causal reading of importance; performance on real data. With {F['test_con']} test continuum events all estimates are imprecise.""")
     nb = nbf.v4.new_notebook(); nb["cells"] = C; nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
     return nb

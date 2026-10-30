@@ -28,6 +28,9 @@ At Belle II, B-pair events (signal-like for B decays, spherical) must be separat
 | Is that physical? | Continuum is normally more jet-like than signal, but the type-0 events look signal-like in these features; I flag it for the instructor rather than changing the mapping. |
 | How did you avoid leakage? | Excluded `type`, index and identifiers; stratified duplicate-aware split before anything learned; preprocessing/weights on training only; model, hyper-parameters and threshold on validation; test scored once; an isolation check with scrambled test data gave identical choices. |
 | Feature reduction? | {{n_feat}} -> {{n_corr}}: {{corr_sentence}}. {{n_feat}} -> {{k_sel}}: {{reduced_sentence}}. Validation is noisy; importance is associational. |
+| Is the weak result a bug? | I checked: labels and positive-class column aligned; metrics recomputed with independent sklearn functions; shuffled-label control AUC {{sa_neg_range}}; the same code reaches validation AUC {{sa_pos_logreg}}/{{sa_pos_boost}} on a learnable task; pooled CV on train+val ({{sa_cv_n_con}} continuum events) gives {{sa_cv_logreg}} (logistic). No bug found. |
+| Has the test set influenced development? | {{sa_disclosure}} |
+| Can event-level leakage be excluded? | No: there is no physical event identifier. Only exact duplicates were checked. |
 | What about the old `type==1` vs rest results? | A different task (negative class contained other decays); kept only as a separate historical note, never compared. |
 
 ## Limitations to state yourself

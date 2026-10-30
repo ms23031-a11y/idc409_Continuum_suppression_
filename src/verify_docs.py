@@ -42,6 +42,16 @@ def main():
         bad = Path(d) / "bad.csv"; data.load_raw(cfg).head(5).drop(columns=["R2"]).to_csv(bad, index=False)
         r2 = subprocess.run([sys.executable, "-m", "src.predict", "--input", str(bad)], cwd=ROOT, capture_output=True, text=True)
         res["CLI rejects missing column with clear message"] = r2.returncode != 0 and "missing" in (r2.stderr + r2.stdout).lower() and "R2" in (r2.stderr + r2.stdout)
+    # numerical claims: "highest test AUC" statements must match the saved results exactly
+    import pandas as pd
+    Rr = pd.read_csv(ROOT / "artifacts/metrics/results_full.csv"); nm = Rr[Rr.model != "majority"]; allmax = f"{nm.test_auc.max():.3f}"; fullmax = f"{nm[nm.feature_set == 'full'].test_auc.max():.3f}"
+    res["'highest test AUC' claims match saved results (all variants / full-feature)"] = all(allmax in t and fullmax in t for t in (texts["report.md"], texts["README.md"])) and F["topall_auc"] == allmax and F["top_auc"] == fullmax
+    res["no 'highest AUC' claim contradicted by a higher reduced/filtered variant"] = (F["topall_key"] == F["top_key"]) or ("every feature-set variant" in texts["report.md"] and "every feature-set variant" in texts["README.md"])
+    res["report has pipeline-check section and test-exposure / event-leakage disclosures"] = all(w in texts["report.md"] for w in ("Is the near-chance result an implementation problem", "event-level leakage cannot be ruled out", "Test-set exposure"))
+    res["README gives notebook run commands"] = "Run the notebook" in texts["README.md"] and "nbconvert" in texts["README.md"] and "CONTINUUM_ROOT" in texts["README.md"]
+    res["notebook setup cell uses project-root discovery (no fragile abspath('..'))"] = "find_project_root" in nbtxt and "abspath('..')" not in nbtxt and 'abspath("..")' not in nbtxt
+    ecs = [c.get("execution_count") for c in nb.cells if c.cell_type == "code"]; res["notebook execution counts are consecutive 1..N (fresh kernel, run in order)"] = ecs == list(range(1, len(ecs) + 1))
+    res["checklist addresses which models are mandatory"] = "mandatory" in texts["requirements_checklist.md"].lower()
     res["ALL_PASSED"] = all(res.values()); (LOG / "docs_verification.json").write_text(json.dumps(res, indent=2))
     for k, v in res.items():
         if k != "ALL_PASSED": print(("PASS " if v else "FAIL ") + k)

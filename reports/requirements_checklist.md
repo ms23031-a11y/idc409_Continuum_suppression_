@@ -8,6 +8,7 @@
 | EDA: distributions, class balance, correlations, signal/background separation | Done | `artifacts/figures/01-07` |
 | Understand and reduce features | Done: feature dictionary; correlation filter + permutation importance | `reports/feature_dictionary.md`, figures 16-17 |
 | >= 3 models in one comparison table | Done: four learned classifiers + two baselines | report Tables A-F, `artifacts/metrics/results_tables.md` |
+| Which models are *mandatory*? | None specifically. The PDF lists, for Project 1, "Logistic Regression, Decision Tree, Random Forest, SVM or Gradient Boosting" (SVM *or* gradient boosting) and, in the general list, "some regression, Decision Tree, SVM, BDT, NN, CNN etc."; the minimum deliverable is "at least 3 model results in one comparison table" plus a baseline ("simple cut or majority-class model"). Logistic regression, decision tree, random forest and gradient boosting are all implemented; SVM and neural networks are not and are not required. | PDF page 1; report section 2 |
 | Metrics: accuracy, precision, recall, F1, ROC-AUC (+ balanced accuracy, macro-F1, per-class, efficiency, rejection, acceptance) | Done at the operating point and at 0.5, with exact / bootstrap intervals | report Tables A-D |
 | Confusion matrix and ROC curve (+ continuum-positive ROC/PR) | Done | figures 10, 11 |
 | Reduced-feature model; full vs reduced comparison | Done | figure 17, Table E |
